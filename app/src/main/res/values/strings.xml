@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Proj13_Tinder</string>
+    <string name="facebook_app_id">1259018044600107</string> <string name="fb_login_protocol_scheme">fb1259018044600107</string>
 </resources>
