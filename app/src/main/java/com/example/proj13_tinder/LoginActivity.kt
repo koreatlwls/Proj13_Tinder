@@ -15,6 +15,7 @@ import com.facebook.login.widget.LoginButton
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
@@ -50,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        finish()
+                        handleSuccessLogin()
                     } else {
                         Toast.makeText(
                             this,
@@ -117,7 +118,7 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithCredential(creadential)
                     .addOnCompleteListener(this@LoginActivity) { task ->
                         if (task.isSuccessful) {
-                            finish()
+                            handleSuccessLogin()
                         } else {
                             Toast.makeText(
                                 this@LoginActivity,
@@ -146,4 +147,18 @@ class LoginActivity : AppCompatActivity() {
         return findViewById<EditText>(R.id.passwordEditText).toString()
     }
 
+    private fun handleSuccessLogin() {
+        if (auth.currentUser == null) {
+            Toast.makeText(this@LoginActivity, "로그인이 실패했습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val userId = auth.currentUser?.uid.orEmpty()
+        val currentUserDB = Firebase.database.reference.child("Users").child(userId)
+        val user = mutableMapOf<String, Any>()
+        user["userId"] = userId
+        currentUserDB.updateChildren(user)
+
+        finish()
+    }
 }
